@@ -130,12 +130,9 @@ class SampleScrollViewController: UIViewController {
                 self?.scrollStateCombineLabel1.text = "Combine1-ContentOffset Y: \(Int(contentOffsetY))"
             }
             .store(in: &cancellables)
-        scrollView.delegatePublisher
-            .map { event -> CGFloat in
-                switch event {
-                case .didScroll(let uiScrollView):
-                    return uiScrollView.contentOffset.y
-                }
+        scrollView.didScrollPublisher
+            .map { scrollView -> CGFloat in
+                return scrollView.contentOffset.y
             }
             .sink { [weak self] contentOffsetY in
                 self?.scrollStateCombineLabel2.text = "Combine2-ContentOffset Y: \(Int(contentOffsetY))"

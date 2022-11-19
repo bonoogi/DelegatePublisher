@@ -10,6 +10,8 @@ import UIKit
 
 public extension UIScrollView {
 
+    // MARK: - 계산 프로퍼티
+
     var delegatePublisher: AnyPublisher<DelegateEvent, Never> {
         let objectIdentifier = ObjectIdentifier(DelegatePublisher.self)
         let id = Int(bitPattern: objectIdentifier)
@@ -23,6 +25,19 @@ public extension UIScrollView {
             return publisher.eraseToAnyPublisher()
         }
     }
+
+    var didScrollPublisher: AnyPublisher<UIScrollView, Never> {
+        return delegatePublisher
+            .map { event -> UIScrollView in
+                switch event {
+                case .didScroll(let scrollView):
+                    return scrollView
+                }
+            }
+            .eraseToAnyPublisher()
+    }
+
+    // MARK: - 내부 타입 선언
 
     enum DelegateEvent {
         case didScroll(UIScrollView)

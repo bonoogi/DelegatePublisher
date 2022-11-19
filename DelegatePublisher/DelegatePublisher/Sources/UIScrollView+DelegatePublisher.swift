@@ -8,10 +8,19 @@
 import Combine
 import UIKit
 
+fileprivate var delegatePublisherStore: [ObjectIdentifier: UIScrollView.DelegatePublisher] = [:]
+
 public extension UIScrollView {
 
     var delegatePublsher: DelegatePublisher {
-        return DelegatePublisher(scrollView: self)
+        let objectIdentifier = ObjectIdentifier(self)
+        if let publisher = delegatePublisherStore[objectIdentifier] {
+            return publisher
+        } else {
+            let publisher = DelegatePublisher(scrollView: self)
+            delegatePublisherStore[objectIdentifier] = publisher
+            return publisher
+        }
     }
 
     enum DelegateEvent {
@@ -34,31 +43,33 @@ public extension UIScrollView {
                 with: subscriber,
                 scrollView: scrollView
             )
-            scrollView.delegate = subscription
             subscriber.receive(subscription: subscription)
+            scrollView.delegate = subscription
         }
     }
 
     class DelegateSubscription<Target: Subscriber>: NSObject, Subscription, UIScrollViewDelegate where Target.Input == DelegateEvent, Target.Failure == Never {
 
-        private var scrollView: UIScrollView
+        private weak var scrollView: UIScrollView?
+        private weak var formerDelegate: UIScrollViewDelegate?
         private var target: Target?
 
         init(with target: Target, scrollView: UIScrollView) {
             self.target = target
             self.scrollView = scrollView
+            self.formerDelegate = scrollView.delegate
         }
 
         public func request(_ demand: Subscribers.Demand) {}
 
         public func cancel() {
-            scrollView.delegate = nil
             target = nil
         }
 
         // MARK: Conform UIScrollViewDelegate
 
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            formerDelegate?.scrollViewDidScroll?(scrollView)
             _ = target?.receive(.didScroll(scrollView))
         }
     }

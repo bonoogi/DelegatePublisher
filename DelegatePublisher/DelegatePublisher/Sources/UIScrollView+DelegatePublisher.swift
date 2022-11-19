@@ -8,18 +8,19 @@
 import Combine
 import UIKit
 
-fileprivate var delegatePublisherStore: [ObjectIdentifier: UIScrollView.DelegatePublisher] = [:]
-
 public extension UIScrollView {
 
-    var delegatePublsher: DelegatePublisher {
-        let objectIdentifier = ObjectIdentifier(self)
-        if let publisher = delegatePublisherStore[objectIdentifier] {
-            return publisher
+    var delegatePublsher: AnyPublisher<DelegateEvent, Never> {
+        let objectIdentifier = ObjectIdentifier(DelegatePublisher.self)
+        let id = Int(bitPattern: objectIdentifier)
+        let rawPointer = UnsafeRawPointer(bitPattern: id)!
+
+        if let publisher = objc_getAssociatedObject(self, rawPointer) as? DelegatePublisher {
+            return publisher.eraseToAnyPublisher()
         } else {
             let publisher = DelegatePublisher(scrollView: self)
-            delegatePublisherStore[objectIdentifier] = publisher
-            return publisher
+            objc_setAssociatedObject(self, rawPointer, publisher, .OBJC_ASSOCIATION_RETAIN)
+            return publisher.eraseToAnyPublisher()
         }
     }
 
@@ -58,6 +59,10 @@ public extension UIScrollView {
             self.target = target
             self.scrollView = scrollView
             self.formerDelegate = scrollView.delegate
+        }
+
+        deinit {
+            print("DEINIT-DelegateSubscription")
         }
 
         public func request(_ demand: Subscribers.Demand) {}

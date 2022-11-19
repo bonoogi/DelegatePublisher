@@ -12,92 +12,36 @@ import DelegatePublisher
 
 class ViewController: UIViewController {
 
-    private var cancellables = Set<AnyCancellable>()
-
-    let scrollStateLabel = UILabel()
-    let scrollView = UIScrollView()
-    let stackView = UIStackView()
+    let button = UIButton()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        view.addSubview(scrollStateLabel)
-        view.addSubview(scrollView)
-        scrollView.addSubview(stackView)
+        title = "DelegatePublisher"
+        view.addSubview(button)
 
         configureViews()
         configureLayouts()
-        addScrollItems()
-        bind()
     }
 
     private func configureViews() {
         view.backgroundColor = .systemBackground
 
-        scrollStateLabel.textAlignment = .center
-        scrollStateLabel.contentMode = .center
-        scrollStateLabel.textColor = .label
-        scrollStateLabel.text = "Waiting for Scrolling Event..."
-
-        stackView.axis = .vertical
-        stackView.distribution = .fill
-        stackView.alignment = .fill
-        stackView.spacing = 8
+        button.setTitle("스크롤뷰 보기", for: .normal)
+        button.setTitleColor(.label, for: .normal)
+        button.addTarget(self, action: #selector(buttonTap), for: .touchUpInside)
     }
 
     private func configureLayouts() {
-        scrollStateLabel.translatesAutoresizingMaskIntoConstraints = false
-        scrollStateLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        scrollStateLabel.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        scrollStateLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        scrollStateLabel.heightAnchor.constraint(equalToConstant: 60).isActive = true
-
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        scrollView.topAnchor.constraint(equalTo: scrollStateLabel.bottomAnchor, constant: 16).isActive = true
-        scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.topAnchor.constraint(equalTo: scrollView.topAnchor).isActive = true
-        stackView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
-
-        scrollView.frameLayoutGuide.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        scrollView.contentLayoutGuide.bottomAnchor.constraint(equalTo: stackView.bottomAnchor).isActive = true
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
+        button.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor).isActive = true
+        button.widthAnchor.constraint(equalToConstant: 120).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 45).isActive = true
     }
 
-    private func addScrollItems() {
-        for index in 0..<100 {
-            let label = UILabel(frame: .zero)
-            label.textAlignment = .center
-            label.contentMode = .center
-            label.textColor = .label
-            label.backgroundColor = .secondarySystemBackground
-            label.text = "\(index)"
-            label.layer.cornerRadius = 16
-            label.layer.masksToBounds = true
-
-            stackView.addArrangedSubview(label)
-
-            label.translatesAutoresizingMaskIntoConstraints = false
-            label.heightAnchor.constraint(equalToConstant: 48).isActive = true
-            label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
-            label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
-        }
-    }
-
-    private func bind() {
-        scrollView.delegatePublsher
-            .map { event -> CGFloat in
-                switch event {
-                case .didScroll(let uiScrollView):
-                    return uiScrollView.contentOffset.y
-                }
-            }
-            .sink { [weak self] contentOffsetY in
-                self?.scrollStateLabel.text = "Current ContentOffset Y: \(Int(contentOffsetY))"
-            }
-            .store(in: &cancellables)
+    @objc private func buttonTap() {
+        let scrollView = SampleScrollViewController()
+        navigationController?.pushViewController(scrollView, animated: true)
     }
 }
 

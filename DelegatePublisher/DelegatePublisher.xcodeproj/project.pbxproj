@@ -23,6 +23,7 @@
 		1E5580F32928D71600EAC712 /* UIScrollView+DelegatePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5580F22928D71600EAC712 /* UIScrollView+DelegatePublisher.swift */; };
 		1E5580F52928DA3000EAC712 /* DelegatePublisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E55806F2928C7A000EAC712 /* DelegatePublisher.framework */; };
 		1E5580F62928DA3000EAC712 /* DelegatePublisher.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1E55806F2928C7A000EAC712 /* DelegatePublisher.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1E5580FD2928ED1900EAC712 /* SampleScrollViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5580FC2928ED1900EAC712 /* SampleScrollViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +91,7 @@
 		1E5580E42928C7CB00EAC712 /* SampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppUITests.swift; sourceTree = "<group>"; };
 		1E5580E62928C7CB00EAC712 /* SampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		1E5580F22928D71600EAC712 /* UIScrollView+DelegatePublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScrollView+DelegatePublisher.swift"; sourceTree = "<group>"; };
+		1E5580FC2928ED1900EAC712 /* SampleScrollViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleScrollViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +184,7 @@
 				1E5580C32928C7CA00EAC712 /* AppDelegate.swift */,
 				1E5580C52928C7CA00EAC712 /* SceneDelegate.swift */,
 				1E5580C72928C7CA00EAC712 /* ViewController.swift */,
+				1E5580FC2928ED1900EAC712 /* SampleScrollViewController.swift */,
 				1E5580C92928C7CA00EAC712 /* Main.storyboard */,
 				1E5580CC2928C7CB00EAC712 /* Assets.xcassets */,
 				1E5580CE2928C7CB00EAC712 /* LaunchScreen.storyboard */,
@@ -444,6 +447,7 @@
 				1E5580C82928C7CA00EAC712 /* ViewController.swift in Sources */,
 				1E5580C42928C7CA00EAC712 /* AppDelegate.swift in Sources */,
 				1E5580C62928C7CA00EAC712 /* SceneDelegate.swift in Sources */,
+				1E5580FD2928ED1900EAC712 /* SampleScrollViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

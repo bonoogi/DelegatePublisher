@@ -20,6 +20,9 @@
 		1E5580DB2928C7CB00EAC712 /* SampleAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5580DA2928C7CB00EAC712 /* SampleAppTests.swift */; };
 		1E5580E52928C7CB00EAC712 /* SampleAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5580E42928C7CB00EAC712 /* SampleAppUITests.swift */; };
 		1E5580E72928C7CB00EAC712 /* SampleAppUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5580E62928C7CB00EAC712 /* SampleAppUITestsLaunchTests.swift */; };
+		1E5580F32928D71600EAC712 /* UIScrollView+DelegatePublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E5580F22928D71600EAC712 /* UIScrollView+DelegatePublisher.swift */; };
+		1E5580F52928DA3000EAC712 /* DelegatePublisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E55806F2928C7A000EAC712 /* DelegatePublisher.framework */; };
+		1E5580F62928DA3000EAC712 /* DelegatePublisher.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 1E55806F2928C7A000EAC712 /* DelegatePublisher.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,7 +47,28 @@
 			remoteGlobalIDString = 1E5580C02928C7CA00EAC712;
 			remoteInfo = SampleApp;
 		};
+		1E5580F72928DA3000EAC712 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 1E5580662928C7A000EAC712 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1E55806E2928C7A000EAC712;
+			remoteInfo = DelegatePublisher;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1E5580F92928DA3000EAC712 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				1E5580F62928DA3000EAC712 /* DelegatePublisher.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1E55806F2928C7A000EAC712 /* DelegatePublisher.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DelegatePublisher.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -65,6 +89,7 @@
 		1E5580E02928C7CB00EAC712 /* SampleAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SampleAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E5580E42928C7CB00EAC712 /* SampleAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppUITests.swift; sourceTree = "<group>"; };
 		1E5580E62928C7CB00EAC712 /* SampleAppUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SampleAppUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		1E5580F22928D71600EAC712 /* UIScrollView+DelegatePublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIScrollView+DelegatePublisher.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -87,6 +112,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E5580F52928DA3000EAC712 /* DelegatePublisher.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,6 +142,7 @@
 				1E5580E32928C7CB00EAC712 /* SampleAppUITests */,
 				1E55807D2928C7A000EAC712 /* DelegatePublisherTests */,
 				1E5580702928C7A000EAC712 /* Products */,
+				1E5580F42928DA3000EAC712 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -134,6 +161,7 @@
 		1E5580712928C7A000EAC712 /* DelegatePublisher */ = {
 			isa = PBXGroup;
 			children = (
+				1E5580F12928D70900EAC712 /* Sources */,
 				1E5580722928C7A000EAC712 /* DelegatePublisher.h */,
 				1E5580732928C7A000EAC712 /* DelegatePublisher.docc */,
 			);
@@ -177,6 +205,21 @@
 				1E5580E62928C7CB00EAC712 /* SampleAppUITestsLaunchTests.swift */,
 			);
 			path = SampleAppUITests;
+			sourceTree = "<group>";
+		};
+		1E5580F12928D70900EAC712 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				1E5580F22928D71600EAC712 /* UIScrollView+DelegatePublisher.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		1E5580F42928DA3000EAC712 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,10 +279,12 @@
 				1E5580BD2928C7CA00EAC712 /* Sources */,
 				1E5580BE2928C7CA00EAC712 /* Frameworks */,
 				1E5580BF2928C7CA00EAC712 /* Resources */,
+				1E5580F92928DA3000EAC712 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				1E5580F82928DA3000EAC712 /* PBXTargetDependency */,
 			);
 			name = SampleApp;
 			productName = SampleApp;
@@ -380,6 +425,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E5580742928C7A000EAC712 /* DelegatePublisher.docc in Sources */,
+				1E5580F32928D71600EAC712 /* UIScrollView+DelegatePublisher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -435,6 +481,11 @@
 			isa = PBXTargetDependency;
 			target = 1E5580C02928C7CA00EAC712 /* SampleApp */;
 			targetProxy = 1E5580E12928C7CB00EAC712 /* PBXContainerItemProxy */;
+		};
+		1E5580F82928DA3000EAC712 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1E55806E2928C7A000EAC712 /* DelegatePublisher */;
+			targetProxy = 1E5580F72928DA3000EAC712 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -635,6 +686,7 @@
 		1E5580872928C7A000EAC712 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -650,6 +702,7 @@
 		1E5580882928C7A000EAC712 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;

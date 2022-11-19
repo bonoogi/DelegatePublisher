@@ -5,9 +5,14 @@
 //  Created by 구본욱 on 2022/11/19.
 //
 
+import Combine
 import UIKit
 
+import DelegatePublisher
+
 class ViewController: UIViewController {
+
+    private var cancellables = Set<AnyCancellable>()
 
     let scrollStateLabel = UILabel()
     let scrollView = UIScrollView()
@@ -23,6 +28,7 @@ class ViewController: UIViewController {
         configureViews()
         configureLayouts()
         addScrollItems()
+        bind()
     }
 
     private func configureViews() {
@@ -31,7 +37,7 @@ class ViewController: UIViewController {
         scrollStateLabel.textAlignment = .center
         scrollStateLabel.contentMode = .center
         scrollStateLabel.textColor = .label
-        scrollStateLabel.text = "Current ContentOffset Y: \(scrollView.contentOffset.y)"
+        scrollStateLabel.text = "Waiting for Scrolling Event..."
 
         stackView.axis = .vertical
         stackView.distribution = .fill
@@ -78,6 +84,20 @@ class ViewController: UIViewController {
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16).isActive = true
             label.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16).isActive = true
         }
+    }
+
+    private func bind() {
+        scrollView.delegatePublsher
+            .map { event -> CGFloat in
+                switch event {
+                case .didScroll(let uiScrollView):
+                    return uiScrollView.contentOffset.y
+                }
+            }
+            .sink { [weak self] contentOffsetY in
+                self?.scrollStateLabel.text = "Current ContentOffset Y: \(Int(contentOffsetY))"
+            }
+            .store(in: &cancellables)
     }
 }
 

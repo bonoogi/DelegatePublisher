@@ -10,7 +10,7 @@ import UIKit
 
 public extension UIScrollView {
 
-    var delegatePublsher: AnyPublisher<DelegateEvent, Never> {
+    var delegatePublisher: AnyPublisher<DelegateEvent, Never> {
         let objectIdentifier = ObjectIdentifier(DelegatePublisher.self)
         let id = Int(bitPattern: objectIdentifier)
         let rawPointer = UnsafeRawPointer(bitPattern: id)!

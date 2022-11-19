@@ -19,7 +19,7 @@ public extension UIScrollView {
             return publisher.eraseToAnyPublisher()
         } else {
             let publisher = DelegatePublisher(scrollView: self)
-            objc_setAssociatedObject(self, rawPointer, publisher, .OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, rawPointer, publisher, .OBJC_ASSOCIATION_ASSIGN)
             return publisher.eraseToAnyPublisher()
         }
     }

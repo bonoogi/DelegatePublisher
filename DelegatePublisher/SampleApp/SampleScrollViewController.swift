@@ -26,10 +26,6 @@ class SampleScrollViewController: UIViewController {
     let scrollView = UIScrollView()
     let stackView = UIStackView()
 
-    deinit {
-        print("DEINIT-SampleScrollviewController")
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "UIScrollView + DelegatePublisher"
@@ -120,11 +116,9 @@ class SampleScrollViewController: UIViewController {
 
     private func bind() {
         scrollView.delegatePublisher
-            .map { event -> CGFloat in
-                switch event {
-                case .didScroll(let uiScrollView):
-                    return uiScrollView.contentOffset.y
-                }
+            .compactMap { event -> CGFloat? in
+                guard case .didScroll(let uiScrollView) = event else { return nil }
+                return uiScrollView.contentOffset.y
             }
             .sink { [weak self] contentOffsetY in
                 self?.scrollStateCombineLabel1.text = "Combine1-ContentOffset Y: \(Int(contentOffsetY))"

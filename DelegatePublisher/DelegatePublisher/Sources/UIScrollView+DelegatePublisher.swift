@@ -28,11 +28,22 @@ public extension UIScrollView {
 
     var didScrollPublisher: AnyPublisher<UIScrollView, Never> {
         return delegatePublisher
-            .map { event -> UIScrollView in
-                switch event {
-                case .didScroll(let scrollView):
-                    return scrollView
+            .compactMap { event -> UIScrollView? in
+                guard case .didScroll(let scrollView) = event else {
+                    return nil
                 }
+                return scrollView
+            }
+            .eraseToAnyPublisher()
+    }
+
+    var willBeginDraggingPublisher: AnyPublisher<UIScrollView, Never> {
+        return delegatePublisher
+            .compactMap { event -> UIScrollView? in
+                guard case .willBeginDragging(let scrollView) = event else {
+                    return nil
+                }
+                return scrollView
             }
             .eraseToAnyPublisher()
     }
@@ -41,6 +52,7 @@ public extension UIScrollView {
 
     enum DelegateEvent {
         case didScroll(UIScrollView)
+        case willBeginDragging(UIScrollView)
     }
 
     struct DelegatePublisher: Publisher {
@@ -76,10 +88,6 @@ public extension UIScrollView {
             self.formerDelegate = scrollView.delegate
         }
 
-        deinit {
-            print("DEINIT-DelegateSubscription")
-        }
-
         public func request(_ demand: Subscribers.Demand) {}
 
         public func cancel() {
@@ -91,6 +99,11 @@ public extension UIScrollView {
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
             formerDelegate?.scrollViewDidScroll?(scrollView)
             _ = target?.receive(.didScroll(scrollView))
+        }
+
+        public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+            formerDelegate?.scrollViewWillBeginDragging?(scrollView)
+            _ = target?.receive(.willBeginDragging(scrollView))
         }
     }
 }

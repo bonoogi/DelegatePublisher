@@ -69,41 +69,39 @@ public extension UIScrollView {
         public func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, UIScrollView.DelegateEvent == S.Input {
             let subscription = DelegateSubscription<S>(
                 with: subscriber,
-                scrollView: scrollView
+                formerDelegate: scrollView.delegate
             )
             subscriber.receive(subscription: subscription)
             scrollView.delegate = subscription
         }
     }
 
-    class DelegateSubscription<Target: Subscriber>: NSObject, Subscription, UIScrollViewDelegate where Target.Input == DelegateEvent, Target.Failure == Never {
+    class DelegateSubscription<S: Subscriber>: NSObject, Subscription, UIScrollViewDelegate where S.Input == DelegateEvent, S.Failure == Never {
 
-        private weak var scrollView: UIScrollView?
         private weak var formerDelegate: UIScrollViewDelegate?
-        private var target: Target?
+        private var subscriber: S?
 
-        init(with target: Target, scrollView: UIScrollView) {
-            self.target = target
-            self.scrollView = scrollView
-            self.formerDelegate = scrollView.delegate
+        init(with subscriber: S, formerDelegate: UIScrollViewDelegate?) {
+            self.subscriber = subscriber
+            self.formerDelegate = formerDelegate
         }
 
         public func request(_ demand: Subscribers.Demand) {}
 
         public func cancel() {
-            target = nil
+            subscriber = nil
         }
 
         // MARK: Conform UIScrollViewDelegate
 
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
             formerDelegate?.scrollViewDidScroll?(scrollView)
-            _ = target?.receive(.didScroll(scrollView))
+            _ = subscriber?.receive(.didScroll(scrollView))
         }
 
         public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
             formerDelegate?.scrollViewWillBeginDragging?(scrollView)
-            _ = target?.receive(.willBeginDragging(scrollView))
+            _ = subscriber?.receive(.willBeginDragging(scrollView))
         }
     }
 }

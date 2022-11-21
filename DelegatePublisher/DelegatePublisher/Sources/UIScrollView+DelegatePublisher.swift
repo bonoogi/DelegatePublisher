@@ -22,6 +22,7 @@ public extension UIScrollView {
         } else {
             let proxy = DelegateProxy(from: self)
             objc_setAssociatedObject(self, rawPointer, proxy, .OBJC_ASSOCIATION_RETAIN)
+            self.delegate = proxy
             return proxy.publisher.eraseToAnyPublisher()
         }
     }
@@ -55,17 +56,14 @@ public extension UIScrollView {
         case willBeginDragging(UIScrollView)
     }
 
-    struct DelegatePublisher: Publisher {
+    class DelegatePublisher: Publisher {
 
         public typealias Output = DelegateEvent
         public typealias Failure = Never
 
-        private let scrollView: UIScrollView
+        private weak var delegateAppender: UIScrollViewDelegateAppender?
 
-        private var delegateAppender: UIScrollViewDelegateAppender
-
-        init(scrollView: UIScrollView, appender: UIScrollViewDelegateAppender) {
-            self.scrollView = scrollView
+        init(appender: UIScrollViewDelegateAppender) {
             self.delegateAppender = appender
         }
 
@@ -74,7 +72,7 @@ public extension UIScrollView {
             subscriber.receive(subscription: subscription)
 
             let type = AnyDelegateType<UIScrollViewDelegate>(subscription)
-            delegateAppender.append(delegateType: type)
+            delegateAppender?.append(delegateType: type)
         }
     }
 
@@ -90,6 +88,10 @@ public extension UIScrollView {
 
         init(with subscriber: S) {
             self.subscriber = subscriber
+        }
+
+        deinit {
+            print("DelegateSubscription Deinit")
         }
 
         public func request(_ demand: Subscribers.Demand) {}
@@ -111,22 +113,19 @@ public extension UIScrollView {
 
     class DelegateProxy: NSObject, UIScrollViewDelegate, UIScrollViewDelegateAppender {
 
-        @WeakCollection var delegateTypes: [AnyDelegateType<UIScrollViewDelegate>]
+        var delegateTypes: [AnyDelegateType<UIScrollViewDelegate>]
 
         private weak var scrollView: UIScrollView?
         private weak var originalDelegate: UIScrollViewDelegate?
-        lazy var publisher: DelegatePublisher = {
-            return DelegatePublisher(scrollView: scrollView!, appender: self)
+        private(set) lazy var publisher: DelegatePublisher = {
+            return DelegatePublisher(appender: self)
         }()
 
         init(from scrollView: UIScrollView) {
             self.scrollView = scrollView
             self.originalDelegate = scrollView.delegate
-
-            super.init()
-
             self.delegateTypes = []
-            scrollView.delegate = self
+            super.init()
         }
 
         func append(delegateType: AnyDelegateType<UIScrollViewDelegate>) {
@@ -137,7 +136,7 @@ public extension UIScrollView {
             for type in delegateTypes {
                 type.delegate.scrollViewDidScroll?(scrollView)
             }
-            originalDelegate?.scrollViewDidScrollToTop?(scrollView)
+            originalDelegate?.scrollViewDidScroll?(scrollView)
         }
 
         public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {

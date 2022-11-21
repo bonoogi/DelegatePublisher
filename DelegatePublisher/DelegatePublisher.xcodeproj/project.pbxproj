@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1E34078E292BB362003D3FF3 /* WeakObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E34078D292BB362003D3FF3 /* WeakObjects.swift */; };
+		1E340790292BB706003D3FF3 /* AnyDelegateType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E34078F292BB706003D3FF3 /* AnyDelegateType.swift */; };
 		1E5580742928C7A000EAC712 /* DelegatePublisher.docc in Sources */ = {isa = PBXBuildFile; fileRef = 1E5580732928C7A000EAC712 /* DelegatePublisher.docc */; };
 		1E55807A2928C7A000EAC712 /* DelegatePublisher.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1E55806F2928C7A000EAC712 /* DelegatePublisher.framework */; };
 		1E55807F2928C7A000EAC712 /* DelegatePublisherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E55807E2928C7A000EAC712 /* DelegatePublisherTests.swift */; };
@@ -72,6 +74,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1E34078D292BB362003D3FF3 /* WeakObjects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeakObjects.swift; sourceTree = "<group>"; };
+		1E34078F292BB706003D3FF3 /* AnyDelegateType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyDelegateType.swift; sourceTree = "<group>"; };
 		1E55806F2928C7A000EAC712 /* DelegatePublisher.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = DelegatePublisher.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1E5580722928C7A000EAC712 /* DelegatePublisher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DelegatePublisher.h; sourceTree = "<group>"; };
 		1E5580732928C7A000EAC712 /* DelegatePublisher.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = DelegatePublisher.docc; sourceTree = "<group>"; };
@@ -135,6 +139,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1E34078C292BB350003D3FF3 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				1E34078D292BB362003D3FF3 /* WeakObjects.swift */,
+				1E34078F292BB706003D3FF3 /* AnyDelegateType.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
 		1E5580652928C7A000EAC712 = {
 			isa = PBXGroup;
 			children = (
@@ -213,6 +226,7 @@
 		1E5580F12928D70900EAC712 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				1E34078C292BB350003D3FF3 /* Utility */,
 				1E5580F22928D71600EAC712 /* UIScrollView+DelegatePublisher.swift */,
 			);
 			path = Sources;
@@ -428,6 +442,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				1E5580742928C7A000EAC712 /* DelegatePublisher.docc in Sources */,
+				1E340790292BB706003D3FF3 /* AnyDelegateType.swift in Sources */,
+				1E34078E292BB362003D3FF3 /* WeakObjects.swift in Sources */,
 				1E5580F32928D71600EAC712 /* UIScrollView+DelegatePublisher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

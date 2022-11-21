@@ -13,16 +13,16 @@ public extension UIScrollView {
     // MARK: - 계산 프로퍼티
 
     var delegatePublisher: AnyPublisher<DelegateEvent, Never> {
-        let objectIdentifier = ObjectIdentifier(DelegatePublisher.self)
+        let objectIdentifier = ObjectIdentifier(DelegateProxy.self)
         let id = Int(bitPattern: objectIdentifier)
         let rawPointer = UnsafeRawPointer(bitPattern: id)!
 
-        if let publisher = objc_getAssociatedObject(self, rawPointer) as? DelegatePublisher {
-            return publisher.eraseToAnyPublisher()
+        if let proxy = objc_getAssociatedObject(self, rawPointer) as? DelegateProxy {
+            return proxy.publisher.eraseToAnyPublisher()
         } else {
-            let publisher = DelegatePublisher(scrollView: self)
-            objc_setAssociatedObject(self, rawPointer, publisher, .OBJC_ASSOCIATION_RETAIN)
-            return publisher.eraseToAnyPublisher()
+            let proxy = DelegateProxy(from: self)
+            objc_setAssociatedObject(self, rawPointer, proxy, .OBJC_ASSOCIATION_RETAIN)
+            return proxy.publisher.eraseToAnyPublisher()
         }
     }
 
@@ -62,28 +62,34 @@ public extension UIScrollView {
 
         private let scrollView: UIScrollView
 
-        init(scrollView: UIScrollView) {
+        private var delegateAppender: UIScrollViewDelegateAppender
+
+        init(scrollView: UIScrollView, appender: UIScrollViewDelegateAppender) {
             self.scrollView = scrollView
+            self.delegateAppender = appender
         }
 
         public func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, UIScrollView.DelegateEvent == S.Input {
-            let subscription = DelegateSubscription<S>(
-                with: subscriber,
-                formerDelegate: scrollView.delegate
-            )
+            let subscription = DelegateSubscription<S>(with: subscriber)
             subscriber.receive(subscription: subscription)
-            scrollView.delegate = subscription
+
+            let type = AnyDelegateType<UIScrollViewDelegate>(subscription)
+            delegateAppender.append(delegateType: type)
         }
     }
 
-    class DelegateSubscription<S: Subscriber>: NSObject, Subscription, UIScrollViewDelegate where S.Input == DelegateEvent, S.Failure == Never {
+    class DelegateSubscription<S: Subscriber>: NSObject, Subscription, UIScrollViewDelegate, DelegateType where S.Input == DelegateEvent, S.Failure == Never {
 
-        private weak var formerDelegate: UIScrollViewDelegate?
+        typealias Delegate = UIScrollViewDelegate
+
         private var subscriber: S?
 
-        init(with subscriber: S, formerDelegate: UIScrollViewDelegate?) {
+        var delegate: Delegate {
+            return self
+        }
+
+        init(with subscriber: S) {
             self.subscriber = subscriber
-            self.formerDelegate = formerDelegate
         }
 
         public func request(_ demand: Subscribers.Demand) {}
@@ -95,67 +101,144 @@ public extension UIScrollView {
         // MARK: UIScrollViewDelegate - Responding to scrolling and dragging
 
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidScroll?(scrollView)
             _ = subscriber?.receive(.didScroll(scrollView))
         }
 
         public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewWillBeginDragging?(scrollView)
             _ = subscriber?.receive(.willBeginDragging(scrollView))
+        }
+    }
+
+    class DelegateProxy: NSObject, UIScrollViewDelegate, UIScrollViewDelegateAppender {
+
+        @WeakCollection var delegateTypes: [AnyDelegateType<UIScrollViewDelegate>]
+
+        private weak var scrollView: UIScrollView?
+        private weak var originalDelegate: UIScrollViewDelegate?
+        lazy var publisher: DelegatePublisher = {
+            return DelegatePublisher(scrollView: scrollView!, appender: self)
+        }()
+
+        init(from scrollView: UIScrollView) {
+            self.scrollView = scrollView
+            self.originalDelegate = scrollView.delegate
+
+            super.init()
+
+            self.delegateTypes = []
+            scrollView.delegate = self
+        }
+
+        func append(delegateType: AnyDelegateType<UIScrollViewDelegate>) {
+            delegateTypes.append(delegateType)
+        }
+
+        public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+            for type in delegateTypes {
+                type.delegate.scrollViewDidScroll?(scrollView)
+            }
+            originalDelegate?.scrollViewDidScrollToTop?(scrollView)
+        }
+
+        public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+            for type in delegateTypes {
+                type.delegate.scrollViewWillBeginDragging?(scrollView)
+            }
+            originalDelegate?.scrollViewWillBeginDragging?(scrollView)
         }
 
         public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-            formerDelegate?.scrollViewWillEndDragging?(scrollView, withVelocity: velocity, targetContentOffset: targetContentOffset)
+            for type in delegateTypes {
+                type.delegate.scrollViewWillEndDragging?(scrollView, withVelocity: velocity, targetContentOffset: targetContentOffset)
+            }
+            originalDelegate?.scrollViewWillEndDragging?(scrollView, withVelocity: velocity, targetContentOffset: targetContentOffset)
         }
 
         public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-            formerDelegate?.scrollViewDidEndDragging?(scrollView, willDecelerate: decelerate)
+            for type in delegateTypes {
+                type.delegate.scrollViewDidEndDragging?(scrollView, willDecelerate: decelerate)
+            }
+            originalDelegate?.scrollViewDidEndDragging?(scrollView, willDecelerate: decelerate)
         }
 
         public func scrollViewShouldScrollToTop(_ scrollView: UIScrollView) -> Bool {
-            return formerDelegate?.scrollViewShouldScrollToTop?(scrollView) ?? true
+            for type in delegateTypes {
+                _ = type.delegate.scrollViewShouldScrollToTop?(scrollView)
+            }
+            return originalDelegate?.scrollViewShouldScrollToTop?(scrollView) ?? true
         }
 
         public func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidScrollToTop?(scrollView)
+            for type in delegateTypes {
+                type.delegate.scrollViewDidScrollToTop?(scrollView)
+            }
+            originalDelegate?.scrollViewDidScrollToTop?(scrollView)
         }
 
         public func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewWillBeginDecelerating?(scrollView)
+            for type in delegateTypes {
+                type.delegate.scrollViewWillBeginDecelerating?(scrollView)
+            }
+            originalDelegate?.scrollViewWillBeginDecelerating?(scrollView)
         }
 
         public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidEndDecelerating?(scrollView)
+            for type in delegateTypes {
+                type.delegate.scrollViewDidEndDecelerating?(scrollView)
+            }
+            originalDelegate?.scrollViewDidEndDecelerating?(scrollView)
         }
 
         // MARK: UIScrollViewDelegate - Managing zooming
 
         public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-            return formerDelegate?.viewForZooming?(in: scrollView)
+            for type in delegateTypes {
+                _ = type.delegate.viewForZooming?(in: scrollView)
+            }
+            return originalDelegate?.viewForZooming?(in: scrollView)
         }
 
         public func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-            formerDelegate?.scrollViewWillBeginZooming?(scrollView, with: view)
+            for type in delegateTypes {
+                type.delegate.scrollViewWillBeginZooming?(scrollView, with: view)
+            }
+            originalDelegate?.scrollViewWillBeginZooming?(scrollView, with: view)
         }
 
         public func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-            formerDelegate?.scrollViewDidEndZooming?(scrollView, with: view, atScale: scale)
+            for type in delegateTypes {
+                type.delegate.scrollViewDidEndZooming?(scrollView, with: view, atScale: scale)
+            }
+            originalDelegate?.scrollViewDidEndZooming?(scrollView, with: view, atScale: scale)
         }
 
         public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidZoom?(scrollView)
+            for type in delegateTypes {
+                type.delegate.scrollViewDidZoom?(scrollView)
+            }
+            originalDelegate?.scrollViewDidZoom?(scrollView)
         }
 
         // MARK: UIScrollViewDelegate - Responding to scrolling animations
 
         public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidEndScrollingAnimation?(scrollView)
+            for type in delegateTypes {
+                type.delegate.scrollViewDidEndScrollingAnimation?(scrollView)
+            }
+            originalDelegate?.scrollViewDidEndScrollingAnimation?(scrollView)
         }
 
         // MARK: UIScrollViewDelegate - Responding to inset changes
 
         public func scrollViewDidChangeAdjustedContentInset(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidChangeAdjustedContentInset?(scrollView)
+            for type in delegateTypes {
+                type.delegate.scrollViewDidChangeAdjustedContentInset?(scrollView)
+            }
+            originalDelegate?.scrollViewDidChangeAdjustedContentInset?(scrollView)
         }
     }
+}
+
+protocol UIScrollViewDelegateAppender: AnyObject {
+    func append(delegateType: AnyDelegateType<UIScrollViewDelegate>)
 }

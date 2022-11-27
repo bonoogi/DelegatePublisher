@@ -17,12 +17,12 @@ public extension UIScrollView {
         let id = Int(bitPattern: objectIdentifier)
         let rawPointer = UnsafeRawPointer(bitPattern: id)!
 
-        if let publisher = objc_getAssociatedObject(self, rawPointer) as? DelegatePublisher {
-            return publisher.eraseToAnyPublisher()
+        if let publisher = objc_getAssociatedObject(self, rawPointer) as? AnyPublisher<DelegateEvent, Never> {
+            return publisher
         } else {
-            let publisher = DelegatePublisher(scrollView: self)
+            let publisher = DelegatePublisher(scrollView: self).share().eraseToAnyPublisher()
             objc_setAssociatedObject(self, rawPointer, publisher, .OBJC_ASSOCIATION_RETAIN)
-            return publisher.eraseToAnyPublisher()
+            return publisher
         }
     }
 
@@ -55,7 +55,7 @@ public extension UIScrollView {
         case willBeginDragging(UIScrollView)
     }
 
-    struct DelegatePublisher: Publisher {
+    internal struct DelegatePublisher: Publisher {
 
         public typealias Output = DelegateEvent
         public typealias Failure = Never
@@ -76,7 +76,7 @@ public extension UIScrollView {
         }
     }
 
-    class DelegateSubscription<S: Subscriber>: NSObject, Subscription, UIScrollViewDelegate where S.Input == DelegateEvent, S.Failure == Never {
+    internal class DelegateSubscription<S: Subscriber>: NSObject, Subscription, UIScrollViewDelegate where S.Input == DelegateEvent, S.Failure == Never {
 
         private weak var formerDelegate: UIScrollViewDelegate?
         private var subscriber: S?

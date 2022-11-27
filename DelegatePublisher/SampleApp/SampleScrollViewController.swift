@@ -29,6 +29,7 @@ class SampleScrollViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "UIScrollView + DelegatePublisher"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "+1", style: .plain, target: self, action: #selector(didTapPlusOne))
 
         view.addSubview(scrollStateStack)
         scrollStateStack.addArrangedSubview(scrollStateDelegateLabel)
@@ -41,6 +42,11 @@ class SampleScrollViewController: UIViewController {
         configureLayouts()
         addScrollItems()
         bind()
+    }
+
+    @objc private func didTapPlusOne() {
+        let scrollView = SampleScrollViewController()
+        navigationController?.pushViewController(scrollView, animated: true)
     }
 
     private func configureViews() {

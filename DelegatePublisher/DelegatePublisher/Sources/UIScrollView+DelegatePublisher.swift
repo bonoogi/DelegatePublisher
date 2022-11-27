@@ -69,7 +69,7 @@ public extension UIScrollView {
         public func receive<S>(subscriber: S) where S: Subscriber, Never == S.Failure, UIScrollView.DelegateEvent == S.Input {
             let subscription = DelegateSubscription<S>(
                 with: subscriber,
-                formerDelegate: scrollView.delegate
+                originalDelegate: scrollView.delegate
             )
             subscriber.receive(subscription: subscription)
             scrollView.delegate = subscription
@@ -78,12 +78,12 @@ public extension UIScrollView {
 
     internal class DelegateSubscription<S: Subscriber>: NSObject, Subscription, UIScrollViewDelegate where S.Input == DelegateEvent, S.Failure == Never {
 
-        private weak var formerDelegate: UIScrollViewDelegate?
+        private weak var originalDelegate: UIScrollViewDelegate?
         private var subscriber: S?
 
-        init(with subscriber: S, formerDelegate: UIScrollViewDelegate?) {
+        init(with subscriber: S, originalDelegate: UIScrollViewDelegate?) {
             self.subscriber = subscriber
-            self.formerDelegate = formerDelegate
+            self.originalDelegate = originalDelegate
         }
 
         public func request(_ demand: Subscribers.Demand) {}
@@ -95,67 +95,67 @@ public extension UIScrollView {
         // MARK: UIScrollViewDelegate - Responding to scrolling and dragging
 
         public func scrollViewDidScroll(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidScroll?(scrollView)
+            originalDelegate?.scrollViewDidScroll?(scrollView)
             _ = subscriber?.receive(.didScroll(scrollView))
         }
 
         public func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewWillBeginDragging?(scrollView)
+            originalDelegate?.scrollViewWillBeginDragging?(scrollView)
             _ = subscriber?.receive(.willBeginDragging(scrollView))
         }
 
         public func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-            formerDelegate?.scrollViewWillEndDragging?(scrollView, withVelocity: velocity, targetContentOffset: targetContentOffset)
+            originalDelegate?.scrollViewWillEndDragging?(scrollView, withVelocity: velocity, targetContentOffset: targetContentOffset)
         }
 
         public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-            formerDelegate?.scrollViewDidEndDragging?(scrollView, willDecelerate: decelerate)
+            originalDelegate?.scrollViewDidEndDragging?(scrollView, willDecelerate: decelerate)
         }
 
         public func scrollViewShouldScrollToTop(_ scrollView: UIScrollView) -> Bool {
-            return formerDelegate?.scrollViewShouldScrollToTop?(scrollView) ?? true
+            return originalDelegate?.scrollViewShouldScrollToTop?(scrollView) ?? true
         }
 
         public func scrollViewDidScrollToTop(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidScrollToTop?(scrollView)
+            originalDelegate?.scrollViewDidScrollToTop?(scrollView)
         }
 
         public func scrollViewWillBeginDecelerating(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewWillBeginDecelerating?(scrollView)
+            originalDelegate?.scrollViewWillBeginDecelerating?(scrollView)
         }
 
         public func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidEndDecelerating?(scrollView)
+            originalDelegate?.scrollViewDidEndDecelerating?(scrollView)
         }
 
         // MARK: UIScrollViewDelegate - Managing zooming
 
         public func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-            return formerDelegate?.viewForZooming?(in: scrollView)
+            return originalDelegate?.viewForZooming?(in: scrollView)
         }
 
         public func scrollViewWillBeginZooming(_ scrollView: UIScrollView, with view: UIView?) {
-            formerDelegate?.scrollViewWillBeginZooming?(scrollView, with: view)
+            originalDelegate?.scrollViewWillBeginZooming?(scrollView, with: view)
         }
 
         public func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-            formerDelegate?.scrollViewDidEndZooming?(scrollView, with: view, atScale: scale)
+            originalDelegate?.scrollViewDidEndZooming?(scrollView, with: view, atScale: scale)
         }
 
         public func scrollViewDidZoom(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidZoom?(scrollView)
+            originalDelegate?.scrollViewDidZoom?(scrollView)
         }
 
         // MARK: UIScrollViewDelegate - Responding to scrolling animations
 
         public func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidEndScrollingAnimation?(scrollView)
+            originalDelegate?.scrollViewDidEndScrollingAnimation?(scrollView)
         }
 
         // MARK: UIScrollViewDelegate - Responding to inset changes
 
         public func scrollViewDidChangeAdjustedContentInset(_ scrollView: UIScrollView) {
-            formerDelegate?.scrollViewDidChangeAdjustedContentInset?(scrollView)
+            originalDelegate?.scrollViewDidChangeAdjustedContentInset?(scrollView)
         }
     }
 }
